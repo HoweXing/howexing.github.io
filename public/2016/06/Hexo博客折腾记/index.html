@@ -30,7 +30,7 @@
 总结
 分享
 装逼">
-<meta property="og:updated_time" content="2016-06-01T08:27:27.613Z">
+<meta property="og:updated_time" content="2016-06-01T14:15:07.357Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hexo博客折腾记">
 <meta name="twitter:description" content="博客(blog)本质是一个记录的地方，而其与手头上的笔记本(纸质或电子)的区别在于，博客是可以通过互联网访问到的，便自然多了分享的特点。一般来说建立博客无非几个目的：
@@ -114,7 +114,7 @@ var _hmt = _hmt || [];
 <p>著名的<del>同性交友</del>网站Github是程序员的好地方，它除了提供了代码仓库以外，还提供了项目Page，我们就可以利用这个来建立一个可靠的、免费的、无限流量的个人博客，当然人家说了空间限制300M。</p>
 <h2 id="为什么用hexo"><a href="#为什么用hexo" class="headerlink" title="为什么用hexo"></a>为什么用hexo</h2><p>Github只是提供了一个空间，并没有类似一般博客那种编辑和管理后台，所以网页都要生成完毕后再放上去。</p>
 <p>hexo是基于nodejs开发的，用于生成静态网页，有很好的模块化特点，很方便进行个性化的改造。如果有前端的经验，学习hexo并不困难。</p>
-<p>学习hexo你可以去<a href="www.hexo.io">Hexo官方主页</a>阅读文档，不过文档的详细程度简直了，所以在使用过程中要善用网络资源。</p>
+<p>学习hexo你可以去<a href="http://www.hexo.io" target="_blank" rel="external">Hexo官方主页</a>阅读文档，不过文档的详细程度简直了，所以在使用过程中要善用网络资源。</p>
 <h1 id="建立hexo博客"><a href="#建立hexo博客" class="headerlink" title="建立hexo博客"></a>建立hexo博客</h1><p>对于hexo博客，网上已经有一大批详细的教程，我觉得比较有用的是<a href="http://ibruce.info" target="_blank" rel="external">不如</a>的博文-<a href="http://ibruce.info/2013/11/22/hexo-your-blog/" target="_blank" rel="external">hexo你的博客</a>。他已经详细地描述了从安装开始的步骤，并介绍了几种自定义方法。<br>不过其中的<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install -g hexo</span><br></pre></td></tr></table></figure></p>
 <p>要更改为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install -g hexo-cli</span><br></pre></td></tr></table></figure></p>
 <p>并且在使用hexo的服务器和部署功能前，你还需要<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-server</span><br><span class="line">npm install hexo-deployer-git</span><br></pre></td></tr></table></figure></p>
@@ -123,7 +123,7 @@ var _hmt = _hmt || [];
 <p>通常以<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">www.googleapis.com</span><br><span class="line">www.gstatic.com</span><br></pre></td></tr></table></figure></p>
 <p>开头。</p>
 <p>对于前者一般在after-footer.ejs文件中被链接，你需要搜索要国内的替代链接，直接在ejs文件里面替换文本。</p>
-<p>对于后者，一般在variable.styl文件中被链接，你可以使用<a href="libs.useso.com">360cdn</a>，不过注意，原来的可能使用的https，而360cdn这个只支持http。</p>
+<p>对于后者，一般在variable.styl文件中被链接，你可以使用<a href="http://libs.useso.com" target="_blank" rel="external">360cdn</a>，不过注意，原来的可能使用的https，而360cdn这个只支持http。</p>
 <h2 id="多机同步"><a href="#多机同步" class="headerlink" title="多机同步"></a>多机同步</h2><p>用hexo部署的静态网页仅有生成以后的网页文件，而没有主题等的设置文件，所以换台电脑，你只能从github上clone下网页内容，而不能再次进行hexo的编辑。</p>
 <p>可以使用github分支来保存hexo文件。为了网页能被互联网访问，静态网页文件需要占用master分支，可以新建一个hexo分支来存hexo文件。</p>
 <p>Github的clone是把所有分支下载，可以使用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git branch -a</span><br></pre></td></tr></table></figure></p>
@@ -144,9 +144,30 @@ var _hmt = _hmt || [];
   </div>
 
     
-    <div class="clearfix"></div>
+    <div class="clearfix">
+      
+      <!-- JiaThis Button BEGIN -->
+</br>
+<div class="jiathis_style">
+	<span class="jiathis_txt">分享到：</span>
+	<a class="jiathis_button_tools_1"></a>
+	<a class="jiathis_button_tools_2"></a>
+	<a class="jiathis_button_tools_3"></a>
+	<a class="jiathis_button_tools_4"></a>
+	<a href="http://www.jiathis.com/share?uid=2102268" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+	<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript">
+var jiathis_config = {data_track_clickback:'true'};
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code_mini/jia.js?uid=2102268" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
   </footer>
 </article>
+
 
 
 <section id="comment">

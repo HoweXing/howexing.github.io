@@ -35,8 +35,13 @@
       <%- partial('post/category') %>
       <%- partial('post/tag') %>
     <% } %>
-    <div class="clearfix"></div>
+    <div class="clearfix">
+      <% if (is_post()){ %>
+      <%-partial('post/jiathis')%>
+      <% } %>
+    </div>
   </footer>
 </article>
+
 
 <%- partial('comment') %>
