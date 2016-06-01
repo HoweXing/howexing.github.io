@@ -1,9 +1,16 @@
 menu:
   #Home: /
-  博文: /archives
+  归档: /archives
   标签: /tags
   关于: /about
 #rss: /atom.xml
+
+widgets: #配置页脚显示哪些小挂件
+  - category
+#  - tag
+  - tagcloud
+  - recent_posts
+#  - blogroll
 
 archive_date_format: MMM DD
 fancybox: true

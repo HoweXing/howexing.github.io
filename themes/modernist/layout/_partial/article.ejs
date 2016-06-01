@@ -15,6 +15,9 @@
     <% } else { %>
       <%- post.content %>
     <% } %>
+    <% if (page.path === "tags/index.html"){ %>
+      <%- partial('_partial/page-tags') %>
+    <% } %>
   </div>
   <footer<% if (index) { %> class="end-sep"<% } %>>
     <% if (index){ %>
