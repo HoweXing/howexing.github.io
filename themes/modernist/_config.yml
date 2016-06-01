@@ -1,12 +1,16 @@
 menu:
-  Home: /
-  Archives: /archives
-rss: /atom.xml
+  #Home: /
+  博文: /archives
+  标签: /tags
+  关于: /about
+#rss: /atom.xml
 
 archive_date_format: MMM DD
 fancybox: true
 
-duoshuo_shortname:
+duoshuo_shortname: xzhspace
 
 google_analytics:
 favicon: /favicon.ico
+
+baidu_tongji: true
