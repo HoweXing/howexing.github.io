@@ -1,0 +1,232 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  
+  <title>Unix文件IO | XZH</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  
+    <meta name="author" content="xingzhihao">
+  
+  
+    <meta name="description" content="Unix系统的文件IO及函数调用。
+文件描述符文件描述符是一个非负整数，又内核分配，函数open和creat返回文件描述符，函数read和write需要文件描述符作为参数。
+在Unix系统中，文件描述符0，1，2有代表特殊的IO：
+
+0 - 标准输入（stdin）
+1 - 标准输出（stdout）
+2 - 标准错误（stderr）">
+  
+  <meta name="description" content="Unix系统的文件IO及函数调用。
+文件描述符文件描述符是一个非负整数，又内核分配，函数open和creat返回文件描述符，函数read和write需要文件描述符作为参数。
+在Unix系统中，文件描述符0，1，2有代表特殊的IO：
+
+0 - 标准输入（stdin）
+1 - 标准输出（stdout）
+2 - 标准错误（stderr）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Unix文件IO">
+<meta property="og:url" content="http://www.xzh.space/2016/06/Unix文件IO/index.html">
+<meta property="og:site_name" content="XZH">
+<meta property="og:description" content="Unix系统的文件IO及函数调用。
+文件描述符文件描述符是一个非负整数，又内核分配，函数open和creat返回文件描述符，函数read和write需要文件描述符作为参数。
+在Unix系统中，文件描述符0，1，2有代表特殊的IO：
+
+0 - 标准输入（stdin）
+1 - 标准输出（stdout）
+2 - 标准错误（stderr）">
+<meta property="og:updated_time" content="2016-06-02T15:03:06.183Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Unix文件IO">
+<meta name="twitter:description" content="Unix系统的文件IO及函数调用。
+文件描述符文件描述符是一个非负整数，又内核分配，函数open和creat返回文件描述符，函数read和write需要文件描述符作为参数。
+在Unix系统中，文件描述符0，1，2有代表特殊的IO：
+
+0 - 标准输入（stdin）
+1 - 标准输出（stdout）
+2 - 标准错误（stderr）">
+  
+  
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+  
+<script type="text/javascript">
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?bcbfe64f39fa66cb8a2c37046dbb7d1d";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+</head>
+
+<body>
+  <div class="wrapper">
+    <header id="header">
+  <div class="title">
+    <h1><a href="/">XZH</a></h1>
+    <p><a href="/">待出栏码农</a></p>
+  </div>
+  <nav class="nav">
+    <ul>
+      
+        <li><a href="/archives">归档</a></li>
+      
+        <li><a href="/tags">标签</a></li>
+      
+        <li><a href="/about">关于</a></li>
+      
+      
+    </ul>
+    <div class="clearfix"></div>
+  </nav>
+  <div class="clearfix"></div>
+</header>
+    <div class="content"><article class="post">
+  <header>
+    
+      <div class="icon"></div>
+      <a href="/2016/06/Unix文件IO/">
+  <time datetime="2016-06-02T14:53:48.000Z">
+    2016-06-02
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title">Unix文件IO</h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      <p>Unix系统的文件IO及函数调用。</p>
+<h2 id="文件描述符"><a href="#文件描述符" class="headerlink" title="文件描述符"></a>文件描述符</h2><p>文件描述符是一个非负整数，又内核分配，函数open和creat返回文件描述符，函数read和write需要文件描述符作为参数。</p>
+<p>在Unix系统中，文件描述符0，1，2有代表特殊的IO：</p>
+<ul>
+<li>0 - 标准输入（stdin）</li>
+<li>1 - 标准输出（stdout）</li>
+<li>2 - 标准错误（stderr）<a id="more"></a>
+文件描述符的上限又操作系统的OPEN_MAX标识，表示一个进程最多能打开的文件个数，相应的文件描述符范围为 0-OPEN_MAX-1。</li>
+</ul>
+<h2 id="函数open和openat"><a href="#函数open和openat" class="headerlink" title="函数open和openat"></a>函数open和openat</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">open</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *path, <span class="keyword">int</span> oflag, ... <span class="comment">/* mode_t mode */</span>)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">openat</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">char</span> *path, <span class="keyword">int</span> oflag, ... <span class="comment">/* mode_t mode */</span>)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>打开文件，并以当前最小可用文件描述符返回。</p>
+<p>带有at的函数一般是对应不带at的函数的相对路径版本，作为参照物的就是带有at函数的第一个参数（文件描述符），在文件IO的函数集中有很多这样的函数对。</p>
+<p>对于带有at的函数，有三种可能性：</p>
+<ul>
+<li>path是绝对路径，fd被忽略，和不带at的函数效果相同</li>
+<li>path是相对路径，则相对于fd所指示的目录，如果fd是AT_FDCWD，则相对于当前工作目录</li>
+</ul>
+<p>添加带有at的文件IO函数，有两个目的：</p>
+<ol>
+<li>让进程内部线程可以使用相对路径打开目录中的文件，而不再只能打开当前工作目录</li>
+<li>避免time-of-check-to-time错误，这是一种漏洞，比如在检查文件和使用文件的非原子操作之间替换掉原始文件</li>
+</ol>
+<p>若_POSIX_NO_TRUNC有效，则当路径名长度超过PATH_MAX或路径中任意文件名长度超过NAME_MAX时，出错返回，并设errno为ENAMETOOLONG，可以使用fpathconf或pathconf来查看_POSIX_NO_TRUNC状态。</p>
+<h2 id="函数creat"><a href="#函数creat" class="headerlink" title="函数creat"></a>函数creat</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">creat</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *path, <span class="keyword">mode_t</span> mode)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>该函数相当于设置了对应oflag参数的open函数</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">open(path, O_WRONLY | O_CREAT | O_TRUNC, mode);</span><br></pre></td></tr></table></figure>
+<p>对于creat函数，不足之处是WRONLY，如果要既写又读文件，则需要先close再次open，其实这种需求可以用open函数设置合适oflag参数达成</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">open(path, O_RDWR | O_CREAT | O_TRUNC, mode);</span><br></pre></td></tr></table></figure>
+
+    
+    
+  </div>
+  <footer>
+    
+      
+      
+  <div class="tags">
+    <a class="tags-link" href="/tags/c/">c</a>, <a class="tags-link" href="/tags/unix/">unix</a>
+  </div>
+
+    
+    <div class="clearfix">
+      
+      <!-- JiaThis Button BEGIN -->
+</br>
+<div class="jiathis_style">
+	<span class="jiathis_txt">分享到：</span>
+	<a class="jiathis_button_tools_1"></a>
+	<a class="jiathis_button_tools_2"></a>
+	<a class="jiathis_button_tools_3"></a>
+	<a class="jiathis_button_tools_4"></a>
+	<a href="http://www.jiathis.com/share?uid=2102268" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+	<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript">
+var jiathis_config = {data_track_clickback:'true'};
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code_mini/jia.js?uid=2102268" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </footer>
+</article>
+
+
+
+<section id="comment">
+  <h1 class="title">评论</h1>
+  <div class="ds-thread" data-title="Unix文件IO">
+  </div>
+</section>
+
+</div>
+  </div>
+  <footer id="footer"><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="site-stat">
+<span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次 | </span>
+<span id="busuanzi_container_site_uv">
+  本站访客数<span id="busuanzi_value_site_uv"></span>人次 | 
+</span>
+<span id="busuanzi_container_page_pv">
+  本页阅读量<span id="busuanzi_value_page_pv"></span>次
+</span>
+</div>
+<div class="copyright">
+  
+  &copy; 2016 <a href="/">xingzhihao</a>
+  
+</div>
+</footer>
+  <script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="/js/scale.fix.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = { short_name: 'xzhspace' };
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';
+    ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+  (function($){
+    $('.fancybox').fancybox();
+  })(jQuery);
+</script>
+
+
+</body>
+</html>
