@@ -4,48 +4,51 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
   
-  <title>Unix文件IO | XZH</title>
+  <title>Unix文件I/O | XZH</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   
     <meta name="author" content="xingzhihao">
   
   
-    <meta name="description" content="Unix系统的文件IO及函数调用。
+    <meta name="description" content="Unix系统的文件I/O及函数调用。
 文件描述符文件描述符是一个非负整数，又内核分配，函数open和creat返回文件描述符，函数read和write需要文件描述符作为参数。
-在Unix系统中，文件描述符0，1，2有代表特殊的IO：
+在Unix系统中，文件描述符0，1，2有代表特殊的I/O：
 
 0 - 标准输入（stdin）
 1 - 标准输出（stdout）
 2 - 标准错误（stderr）">
   
-  <meta name="description" content="Unix系统的文件IO及函数调用。
+  <meta name="description" content="Unix系统的文件I/O及函数调用。
 文件描述符文件描述符是一个非负整数，又内核分配，函数open和creat返回文件描述符，函数read和write需要文件描述符作为参数。
-在Unix系统中，文件描述符0，1，2有代表特殊的IO：
+在Unix系统中，文件描述符0，1，2有代表特殊的I/O：
 
 0 - 标准输入（stdin）
 1 - 标准输出（stdout）
 2 - 标准错误（stderr）">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Unix文件IO">
+<meta property="og:title" content="Unix文件I/O">
 <meta property="og:url" content="http://www.xzh.space/2016/06/Unix文件IO/index.html">
 <meta property="og:site_name" content="XZH">
-<meta property="og:description" content="Unix系统的文件IO及函数调用。
+<meta property="og:description" content="Unix系统的文件I/O及函数调用。
 文件描述符文件描述符是一个非负整数，又内核分配，函数open和creat返回文件描述符，函数read和write需要文件描述符作为参数。
-在Unix系统中，文件描述符0，1，2有代表特殊的IO：
+在Unix系统中，文件描述符0，1，2有代表特殊的I/O：
 
 0 - 标准输入（stdin）
 1 - 标准输出（stdout）
 2 - 标准错误（stderr）">
-<meta property="og:updated_time" content="2016-06-02T15:03:06.183Z">
+<meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-3.7.PNG">
+<meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-3.8.PNG">
+<meta property="og:updated_time" content="2016-06-03T14:22:57.129Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Unix文件IO">
-<meta name="twitter:description" content="Unix系统的文件IO及函数调用。
+<meta name="twitter:title" content="Unix文件I/O">
+<meta name="twitter:description" content="Unix系统的文件I/O及函数调用。
 文件描述符文件描述符是一个非负整数，又内核分配，函数open和creat返回文件描述符，函数read和write需要文件描述符作为参数。
-在Unix系统中，文件描述符0，1，2有代表特殊的IO：
+在Unix系统中，文件描述符0，1，2有代表特殊的I/O：
 
 0 - 标准输入（stdin）
 1 - 标准输出（stdout）
 2 - 标准错误（stderr）">
+<meta name="twitter:image" content="http://o877ej38d.bkt.clouddn.com/apue-3.7.PNG">
   
   
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -101,16 +104,16 @@ var _hmt = _hmt || [];
     
     
   
-    <h1 class="title">Unix文件IO</h1>
+    <h1 class="title">Unix文件I/O</h1>
   
 
   </header>
   
   <div class="entry">
     
-      <p>Unix系统的文件IO及函数调用。</p>
+      <p>Unix系统的文件I/O及函数调用。</p>
 <h2 id="文件描述符"><a href="#文件描述符" class="headerlink" title="文件描述符"></a>文件描述符</h2><p>文件描述符是一个非负整数，又内核分配，函数open和creat返回文件描述符，函数read和write需要文件描述符作为参数。</p>
-<p>在Unix系统中，文件描述符0，1，2有代表特殊的IO：</p>
+<p>在Unix系统中，文件描述符0，1，2有代表特殊的I/O：</p>
 <ul>
 <li>0 - 标准输入（stdin）</li>
 <li>1 - 标准输出（stdout）</li>
@@ -125,7 +128,7 @@ var _hmt = _hmt || [];
 <li>path是绝对路径，fd被忽略，和不带at的函数效果相同</li>
 <li>path是相对路径，则相对于fd所指示的目录，如果fd是AT_FDCWD，则相对于当前工作目录</li>
 </ul>
-<p>添加带有at的文件IO函数，有两个目的：</p>
+<p>添加带有at的文件I/O函数，有两个目的：</p>
 <ol>
 <li>让进程内部线程可以使用相对路径打开目录中的文件，而不再只能打开当前工作目录</li>
 <li>避免time-of-check-to-time错误，这是一种漏洞，比如在检查文件和使用文件的非原子操作之间替换掉原始文件</li>
@@ -136,6 +139,49 @@ var _hmt = _hmt || [];
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">open(path, O_WRONLY | O_CREAT | O_TRUNC, mode);</span><br></pre></td></tr></table></figure>
 <p>对于creat函数，不足之处是WRONLY，如果要既写又读文件，则需要先close再次open，其实这种需求可以用open函数设置合适oflag参数达成</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">open(path, O_RDWR | O_CREAT | O_TRUNC, mode);</span><br></pre></td></tr></table></figure>
+<h2 id="函数close"><a href="#函数close" class="headerlink" title="函数close"></a>函数close</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">close</span><span class="params">(<span class="keyword">int</span> fd)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>关闭文件时会释放该进程加在该文件上的所有记录锁。</p>
+<p>当进程终止时，它打开的所有文件都会被内核关闭。</p>
+<h2 id="函数lseek"><a href="#函数lseek" class="headerlink" title="函数lseek"></a>函数lseek</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="keyword">off_t</span> lseek(<span class="keyword">int</span> fd, <span class="keyword">off_t</span> offset, <span class="keyword">int</span> whence);</span><br></pre></td></tr></table></figure>
+<p>进程打开的每个文件都有对应的文件偏移量，通常为非负整数。打开文件时一般是从偏移量0开始，若指定O_APPEND，则偏移量为文件长度。</p>
+<p>根据wherece不同情况：</p>
+<ul>
+<li>SEEK_SET 相对文件开始的偏移量，offset为正（某些系统允许负偏移）</li>
+<li>SEEK_CUR 相对当前位置的偏移量，offset可正可负</li>
+<li>SEEK_END 相对结尾位置的偏移量，offset可正可负</li>
+</ul>
+<p>因为lseek成功时返回当前偏移量，可以使用</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">off_t</span> currpos = lseek(fd, <span class="number">0</span>, SEEK_CUR);</span><br></pre></td></tr></table></figure>
+<p>获得当前文件偏移量。</p>
+<p>当偏移后超过当前文件长度时，将形成空洞，空洞并不在磁盘上占用存储区，若打印时则会以0x00表示这部分的值，虽然它们在磁盘上并不存在。</p>
+<p>对于描述符指向管道、FIFO或套接字时，lseek返回-1，并置errno为ESPIPE。因为当前偏移值可能为负值，所以不能以lseek的返回值作为判断成功与否的依据，应看errno的情况。</p>
+<p>off_t是32为有符号整型，所以只能操纵2G以内的文件，如果需要操作大文件，需要使用64位版本函数。</p>
+<h2 id="函数read"><a href="#函数read" class="headerlink" title="函数read"></a>函数read</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="keyword">ssize_t</span> read(<span class="keyword">int</span> fd, <span class="keyword">void</span> *buf, <span class="keyword">size_t</span> nbytes);</span><br></pre></td></tr></table></figure>
+<p>read成功时返回读取字节数，到结尾则返回0，出错返回-1。</p>
+<p>实际读取长度（read返回值）可能小于作为参数传入的nbytes的值，因为：</p>
+<ul>
+<li>文件要看结尾之前还剩多少字节</li>
+<li>终端设备一次可能只能读一行</li>
+<li>网络缓冲可读字节数</li>
+<li>管道和FIFO当前可读字节数</li>
+<li>磁带等面向记录的设备一次只能读一个记录</li>
+<li>信号导致中断</li>
+</ul>
+<h2 id="函数write"><a href="#函数write" class="headerlink" title="函数write"></a>函数write</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd,h&gt;</span></span></span><br><span class="line"><span class="keyword">ssize_t</span> write(<span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">void</span> *buf, size_t1 nbytes);</span><br></pre></td></tr></table></figure>
+<p>write的返回值和nbytes相同表示成功，否则就是出错，出错原因时磁盘已满或超过了该进程的文件长度限制。write成功之后，文件偏移量增加实际写的字节数。</p>
+<h2 id="I-O的效率"><a href="#I-O的效率" class="headerlink" title="I/O的效率"></a>I/O的效率</h2><p>预读技术被用来该神性能，当检测到正在顺序读取时，系统就试图读入比应用所要求的更多数据。</p>
+<h2 id="文件共享"><a href="#文件共享" class="headerlink" title="文件共享"></a>文件共享</h2><p>nix系统支持在不同进程间共享打开文件。对于一个进程，在进程表中有该进程的记录项，记录项中包含一张打开文件表，打开文件表的每一项对应一个打开文件，每一项有一个文件指针指向一个文件表项。文件表项中有文件状态标志（读、写等），当前文件偏移量（lseek用到的），又指向一个v节点，v节点又包含i节点。</p>
+<p>下图中显示了fd为0和1的两个文件，即标准输入和标准输出。</p>
+<p><img src="http://o877ej38d.bkt.clouddn.com/apue-3.7.PNG" alt="3.7.png"></p>
+<p>若有两个进程，A进程在fd 3上打开一文件，B进程在fd 4上打开同一个文件，则其文件打开表的数据结构如下。两个进程各有一个文件表项，指向同一个v节点。</p>
+<p><img src="http://o877ej38d.bkt.clouddn.com/apue-3.8.PNG" alt="3.8.png"></p>
+<p>之所以每个进程都获得自己的文件表项，是因为可以使每个进程都有它自己的对该文件的当前偏移量。</p>
+<p>可能又多个文件描述符项指向同一文件表项，dup和fork导致这一结果，其中fork是父子进程各自的每一个打开文件描述符共享同一个文件表项。</p>
+<p>注意：</p>
+<ul>
+<li>文件描述符标志只用于一个进程的一个描述符</li>
+<li>文件状态标志则应用于指向该给定文件表项的任何进程中的所有描述符</li>
+</ul>
 
     
     
@@ -177,7 +223,7 @@ var jiathis_config = {data_track_clickback:'true'};
 
 <section id="comment">
   <h1 class="title">评论</h1>
-  <div class="ds-thread" data-title="Unix文件IO">
+  <div class="ds-thread" data-title="Unix文件I/O">
   </div>
 </section>
 
