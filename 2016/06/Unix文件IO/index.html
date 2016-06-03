@@ -38,7 +38,8 @@
 2 - 标准错误（stderr）">
 <meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-3.7.PNG">
 <meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-3.8.PNG">
-<meta property="og:updated_time" content="2016-06-03T14:22:57.129Z">
+<meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-3.9.PNG">
+<meta property="og:updated_time" content="2016-06-03T15:14:38.080Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Unix文件I/O">
 <meta name="twitter:description" content="Unix系统的文件I/O及函数调用。
@@ -172,15 +173,39 @@ var _hmt = _hmt || [];
 <h2 id="I-O的效率"><a href="#I-O的效率" class="headerlink" title="I/O的效率"></a>I/O的效率</h2><p>预读技术被用来该神性能，当检测到正在顺序读取时，系统就试图读入比应用所要求的更多数据。</p>
 <h2 id="文件共享"><a href="#文件共享" class="headerlink" title="文件共享"></a>文件共享</h2><p>nix系统支持在不同进程间共享打开文件。对于一个进程，在进程表中有该进程的记录项，记录项中包含一张打开文件表，打开文件表的每一项对应一个打开文件，每一项有一个文件指针指向一个文件表项。文件表项中有文件状态标志（读、写等），当前文件偏移量（lseek用到的），又指向一个v节点，v节点又包含i节点。</p>
 <p>下图中显示了fd为0和1的两个文件，即标准输入和标准输出。</p>
-<p><img src="http://o877ej38d.bkt.clouddn.com/apue-3.7.PNG" alt="3.7.png"></p>
+<p><img src="http://o877ej38d.bkt.clouddn.com/apue-3.7.PNG" alt="打开文件表数据结构"></p>
 <p>若有两个进程，A进程在fd 3上打开一文件，B进程在fd 4上打开同一个文件，则其文件打开表的数据结构如下。两个进程各有一个文件表项，指向同一个v节点。</p>
-<p><img src="http://o877ej38d.bkt.clouddn.com/apue-3.8.PNG" alt="3.8.png"></p>
+<p><img src="http://o877ej38d.bkt.clouddn.com/apue-3.8.PNG" alt="文件共享"></p>
 <p>之所以每个进程都获得自己的文件表项，是因为可以使每个进程都有它自己的对该文件的当前偏移量。</p>
-<p>可能又多个文件描述符项指向同一文件表项，dup和fork导致这一结果，其中fork是父子进程各自的每一个打开文件描述符共享同一个文件表项。</p>
+<p>可能有多个文件描述符项指向同一文件表项，dup和fork导致这一结果，其中fork是父子进程各自的每一个打开文件描述符共享同一个文件表项。</p>
 <p>注意：</p>
 <ul>
 <li>文件描述符标志只用于一个进程的一个描述符</li>
 <li>文件状态标志则应用于指向该给定文件表项的任何进程中的所有描述符</li>
+</ul>
+<h2 id="原子操作"><a href="#原子操作" class="headerlink" title="原子操作"></a>原子操作</h2><h3 id="追加到一个文件"><a href="#追加到一个文件" class="headerlink" title="追加到一个文件"></a>追加到一个文件</h3><p>向文件末尾添加数据，如果先lseek再write，这就使用了两个函数调用，而现今的操作系统都是多任务的，若A进程lseek到了文件D的末尾，想要开始写100字节，写之前因为种种原因，A进程挂起，B进程开始，而B进程同样要写D文件，注意D文件到现在还没有被改动过，所以B进程lseek到末尾开始了write，完成后退出，此时A进程又被调度，A进程此时处于lseek完毕要write的状态，而它想当然地以为它的D文件当前偏移量正好是D文件的末尾，实时是D文件已经被B进程加长了，此时A进程的write就改动了B进程刚写入的内容。</p>
+<p>造成这种情况的原因就是，两个分离的函数调用不是原子操作，可能随时被中途挂起。对于追加文件这种，在打开文件时设置O_APPEND，这样在每一次write之前，内核都将把当前文件偏移量设置到当前文件末尾。</p>
+<h3 id="函数pread和pwrite"><a href="#函数pread和pwrite" class="headerlink" title="函数pread和pwrite"></a>函数pread和pwrite</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="keyword">ssize_t</span> pread(<span class="keyword">int</span> fd, <span class="keyword">void</span> *buf, <span class="keyword">size_t</span> nbytes, <span class="keyword">off_t</span> offset);</span><br><span class="line"><span class="keyword">ssize_t</span> pwrite(<span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">void</span> *buf, <span class="keyword">size_t</span> nbytes, <span class="keyword">off_t</span> offset);</span><br></pre></td></tr></table></figure>
+<p>pread相当于lseek跟read，pwrite相当于lseek跟write，其区别为在pread和pwrite期间：</p>
+<ul>
+<li>无法中断其定位和读或写操作</li>
+<li>不更新当前文件偏移量</li>
+</ul>
+<h3 id="创建一个文件"><a href="#创建一个文件" class="headerlink" title="创建一个文件"></a>创建一个文件</h3><p>使用open并设置O_CREAT和O_EXCL就可以原子地判断文件是否存在，存在时open失败，不存在时创建文件。</p>
+<p>如果没有上述功能，使用设置O_WRONLY设置的open加上creat来实现同样的逻辑时，可能中途被挂起，导致别的进程新创建的文件被覆盖。</p>
+<h2 id="函数dup和dup2"><a href="#函数dup和dup2" class="headerlink" title="函数dup和dup2"></a>函数dup和dup2</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">dup</span><span class="params">(<span class="keyword">int</span> fd)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">dup2</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">int</span> fd2)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>dup使用另外一个文件描述符，它和fd共享文件表项，并返回这个新的文件描述符，它总是最小可用的文件描述符。</p>
+<p>dup2使用fd2设置新描述符的值。如果fd2已经打开，则先关闭它。若fd等于fd2，则返回fd2，而不关闭它。否则fd2的FD_CLOEXEC文件描述符标志被清除，这样fd2在进程调用exec时是打开状态。</p>
+<p>下图表示的是dup(1)的情况，假设3是当前最小可用的文件描述符。</p>
+<p><img src="http://o877ej38d.bkt.clouddn.com/apue-3.9.PNG" alt="dup(1)"></p>
+<p>每个文件描述符都有其自己的一套文件描述符标志，新描述符的执行时关闭（close-on-exec）标志总是由dup函数清除。</p>
+<p>复制一个描述符还可以用fcntl函数，下面两组函数功能上是相同的。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">dup(fd);</span><br><span class="line"><span class="comment">//和</span></span><br><span class="line">fcntl(fd, F_DUPFD, <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">dup2(fd, fd2);</span><br><span class="line"><span class="comment">//和</span></span><br><span class="line">close(fd2);</span><br><span class="line">fcntl(fd, F_DUPFD, fd2);</span><br></pre></td></tr></table></figure>
+<p>后一组有两处不同：</p>
+<ul>
+<li>dup2是原子操作，close和fcntl是两个函数调用</li>
+<li>dup2和fcntl在errno上不同</li>
 </ul>
 
     
