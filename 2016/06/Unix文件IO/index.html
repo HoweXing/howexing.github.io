@@ -36,7 +36,9 @@
 0 - 标准输入（stdin）
 1 - 标准输出（stdout）
 2 - 标准错误（stderr）">
-<meta property="og:updated_time" content="2016-06-03T13:16:56.970Z">
+<meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-3.7.PNG">
+<meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-3.8.PNG">
+<meta property="og:updated_time" content="2016-06-03T14:22:57.129Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Unix文件I/O">
 <meta name="twitter:description" content="Unix系统的文件I/O及函数调用。
@@ -46,6 +48,7 @@
 0 - 标准输入（stdin）
 1 - 标准输出（stdout）
 2 - 标准错误（stderr）">
+<meta name="twitter:image" content="http://o877ej38d.bkt.clouddn.com/apue-3.7.PNG">
   
   
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -167,7 +170,19 @@ var _hmt = _hmt || [];
 <h2 id="函数write"><a href="#函数write" class="headerlink" title="函数write"></a>函数write</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd,h&gt;</span></span></span><br><span class="line"><span class="keyword">ssize_t</span> write(<span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">void</span> *buf, size_t1 nbytes);</span><br></pre></td></tr></table></figure>
 <p>write的返回值和nbytes相同表示成功，否则就是出错，出错原因时磁盘已满或超过了该进程的文件长度限制。write成功之后，文件偏移量增加实际写的字节数。</p>
 <h2 id="I-O的效率"><a href="#I-O的效率" class="headerlink" title="I/O的效率"></a>I/O的效率</h2><p>预读技术被用来该神性能，当检测到正在顺序读取时，系统就试图读入比应用所要求的更多数据。</p>
-<h2 id="文件共享"><a href="#文件共享" class="headerlink" title="文件共享"></a>文件共享</h2>
+<h2 id="文件共享"><a href="#文件共享" class="headerlink" title="文件共享"></a>文件共享</h2><p>nix系统支持在不同进程间共享打开文件。对于一个进程，在进程表中有该进程的记录项，记录项中包含一张打开文件表，打开文件表的每一项对应一个打开文件，每一项有一个文件指针指向一个文件表项。文件表项中有文件状态标志（读、写等），当前文件偏移量（lseek用到的），又指向一个v节点，v节点又包含i节点。</p>
+<p>下图中显示了fd为0和1的两个文件，即标准输入和标准输出。</p>
+<p><img src="http://o877ej38d.bkt.clouddn.com/apue-3.7.PNG" alt="3.7.png"></p>
+<p>若有两个进程，A进程在fd 3上打开一文件，B进程在fd 4上打开同一个文件，则其文件打开表的数据结构如下。两个进程各有一个文件表项，指向同一个v节点。</p>
+<p><img src="http://o877ej38d.bkt.clouddn.com/apue-3.8.PNG" alt="3.8.png"></p>
+<p>之所以每个进程都获得自己的文件表项，是因为可以使每个进程都有它自己的对该文件的当前偏移量。</p>
+<p>可能又多个文件描述符项指向同一文件表项，dup和fork导致这一结果，其中fork是父子进程各自的每一个打开文件描述符共享同一个文件表项。</p>
+<p>注意：</p>
+<ul>
+<li>文件描述符标志只用于一个进程的一个描述符</li>
+<li>文件状态标志则应用于指向该给定文件表项的任何进程中的所有描述符</li>
+</ul>
+
     
     
   </div>
