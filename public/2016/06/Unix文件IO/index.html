@@ -16,7 +16,9 @@
 
 0 - 标准输入（stdin）
 1 - 标准输出（stdout）
-2 - 标准错误（stderr）">
+2 - 标准错误（stderr）
+
+文件描述符的上限又操作系统的OPEN_MAX标识，表示一个进">
   
   <meta name="description" content="Unix系统的文件I/O及函数调用。
 文件描述符文件描述符是一个非负整数，又内核分配，函数open和creat返回文件描述符，函数read和write需要文件描述符作为参数。
@@ -24,7 +26,9 @@
 
 0 - 标准输入（stdin）
 1 - 标准输出（stdout）
-2 - 标准错误（stderr）">
+2 - 标准错误（stderr）
+
+文件描述符的上限又操作系统的OPEN_MAX标识，表示一个进">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Unix文件I/O">
 <meta property="og:url" content="http://www.xzh.space/2016/06/Unix文件IO/index.html">
@@ -35,11 +39,13 @@
 
 0 - 标准输入（stdin）
 1 - 标准输出（stdout）
-2 - 标准错误（stderr）">
+2 - 标准错误（stderr）
+
+文件描述符的上限又操作系统的OPEN_MAX标识，表示一个进">
 <meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-3.7.PNG">
 <meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-3.8.PNG">
 <meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-3.9.PNG">
-<meta property="og:updated_time" content="2016-06-03T15:14:38.080Z">
+<meta property="og:updated_time" content="2016-06-04T15:57:14.433Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Unix文件I/O">
 <meta name="twitter:description" content="Unix系统的文件I/O及函数调用。
@@ -48,7 +54,9 @@
 
 0 - 标准输入（stdin）
 1 - 标准输出（stdout）
-2 - 标准错误（stderr）">
+2 - 标准错误（stderr）
+
+文件描述符的上限又操作系统的OPEN_MAX标识，表示一个进">
 <meta name="twitter:image" content="http://o877ej38d.bkt.clouddn.com/apue-3.7.PNG">
   
   
@@ -118,16 +126,17 @@ var _hmt = _hmt || [];
 <ul>
 <li>0 - 标准输入（stdin）</li>
 <li>1 - 标准输出（stdout）</li>
-<li>2 - 标准错误（stderr）<a id="more"></a>
-文件描述符的上限又操作系统的OPEN_MAX标识，表示一个进程最多能打开的文件个数，相应的文件描述符范围为 0-OPEN_MAX-1。</li>
+<li>2 - 标准错误（stderr）</li>
 </ul>
+<p>文件描述符的上限又操作系统的OPEN_MAX标识，表示一个进程最多能打开的文件个数，相应的文件描述符范围为 0-OPEN_MAX-1。</p>
 <h2 id="函数open和openat"><a href="#函数open和openat" class="headerlink" title="函数open和openat"></a>函数open和openat</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">open</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *path, <span class="keyword">int</span> oflag, ... <span class="comment">/* mode_t mode */</span>)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">openat</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">char</span> *path, <span class="keyword">int</span> oflag, ... <span class="comment">/* mode_t mode */</span>)</span></span>;</span><br></pre></td></tr></table></figure>
 <p>打开文件，并以当前最小可用文件描述符返回。</p>
 <p>带有at的函数一般是对应不带at的函数的相对路径版本，作为参照物的就是带有at函数的第一个参数（文件描述符），在文件IO的函数集中有很多这样的函数对。</p>
 <p>对于带有at的函数，有三种可能性：</p>
 <ul>
 <li>path是绝对路径，fd被忽略，和不带at的函数效果相同</li>
-<li>path是相对路径，则相对于fd所指示的目录，如果fd是AT_FDCWD，则相对于当前工作目录</li>
+<li>path是相对路径，则相对于fd所指示的目录，如果fd是AT_FDCWD，则相对于当前工作目录<a id="more"></a>
+</li>
 </ul>
 <p>添加带有at的文件I/O函数，有两个目的：</p>
 <ol>
@@ -207,6 +216,34 @@ var _hmt = _hmt || [];
 <li>dup2是原子操作，close和fcntl是两个函数调用</li>
 <li>dup2和fcntl在errno上不同</li>
 </ul>
+<h2 id="函数sync、fsync和fdatasync"><a href="#函数sync、fsync和fdatasync" class="headerlink" title="函数sync、fsync和fdatasync"></a>函数sync、fsync和fdatasync</h2><p>因为I/O缓冲区的存在，写入的文件并不是立即写到磁盘中，当缓冲区被复用时，已更改过的文件才被写回磁盘，或者使用这三个函数来将缓冲区写回。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">fsync</span><span class="params">(<span class="keyword">int</span> fd)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">fdatasync</span><span class="params">(<span class="keyword">int</span> fd)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">sync</span><span class="params">(<span class="keyword">void</span>)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>sync只是将所有修改过的块缓冲区排入写队列，然后就返回，不等待磁盘写操作完成。一般守护进程update周期性地调用sync函数来定期冲洗缓冲区。</p>
+<p>fsync只对文件描述符fd指定的文件起作用，并等待到磁盘写完成才返回。一般数据库程序使用fsync函数，来保证修改过的块立即写到磁盘上。</p>
+<p>fdatasync函数类似于fsync函数，区别在于fdatasync仅影响文件的数据部分，而fsync还会同步更新文件的属性。</p>
+<h2 id="函数fcntl"><a href="#函数fcntl" class="headerlink" title="函数fcntl"></a>函数fcntl</h2><p>fcntl函数可以改变已经打开文件的属性。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">fcntl</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">int</span> cmd, ... <span class="comment">/* int arg */</span>)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>fcntl有5种功能：</p>
+<ul>
+<li><p>复制一个已有的描述符（cmd = F_DUPFD或F_DUPFD_CLOEXEC）。复制fd，返回大于等于arg的最小可用文件描述符。对于设置还是清除新文件描述符的FD_CLOEXEC标志，在于使用从的cmd是F_DUPFD（清除）还是F_DUPFD_CLOEXEC（设置）。</p>
+</li>
+<li><p>获取/设置文件描述符标志（cmd = F_GETFD或F_SETFD）。F_GETFD时返回文件描述符fd的标志。F_SETFD时将文件描述符fd的标志设置为arg。</p>
+</li>
+<li><p>获取/设置文件状态标志（cmd = F_GETFL或F_SETFD）。即获取/设置读写模式和同步策略这些。</p>
+</li>
+<li><p>获取/设置异步I/O所有权（cmd = F_GETOWN或F_SETOWN）。获取/设置接受SIGIO和SIGURG信号的进程ID或进程组ID。正的arg指定一个进程ID，负的arg表示等于arg绝对值的一个进程组ID。</p>
+</li>
+<li><p>获取/设置记录锁（cmd = F_GETLK、F_SETLK或F_SETLKW）。</p>
+</li>
+</ul>
+<h2 id="函数ioctl"><a href="#函数ioctl" class="headerlink" title="函数ioctl"></a>函数ioctl</h2><p>I/O操作不能用上面函数完成的功能通常都可以用ioctl表示，最常用于终端I/O。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span>	<span class="comment">/* System V */</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/ioctl.h&gt;</span>	<span class="comment">/* BSD and Linux */</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">ioctl</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">int</span> request, ...)</span></span>;</span><br></pre></td></tr></table></figure>
+<h2 id="dev-fd"><a href="#dev-fd" class="headerlink" title="/dev/fd"></a>/dev/fd</h2><p>打开dev/fd/n对应文件等效于复制描述符n（若n是打开的）。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">fd = open(<span class="string">"/dev/fd/0"</span>,mode);</span><br><span class="line">fd = dup(<span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+<p>是等价的，0和fd共享同一文件表项。若0先前被打开为只读，那么也只能对fd进行读操作，就算下面这个语句执行是成功的</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fd = open(<span class="string">"/dev/fd/0"</span>,O_RDWR);</span><br></pre></td></tr></table></figure>
+<p>仍然只能对fd进行读操作。</p>
+<p>可以使用/dev/fd作为路径名调用creat，这与open时用O_CREAT是一样的。</p>
 
     
     

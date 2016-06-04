@@ -4,21 +4,30 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
   
-  <title>XZH</title>
+  <title>Unix文件和目录 | XZH</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   
     <meta name="author" content="xingzhihao">
   
   
-  <meta name="description" content="编程 互联网 技术 程序员 码农">
-<meta property="og:type" content="website">
-<meta property="og:title" content="XZH">
-<meta property="og:url" content="http://www.xzh.space/index.html">
+    <meta name="description" content="文件属性含义，修改文件属性，Unix文件系统结构和符号链接，目录操作。
+函数stat、fstat、fstatat和lstat12345#include &amp;lt;sys/stat.h&amp;gt;int stat(const char *restrict pathname, struct stat *restrict buf);int fstat(int fd, struct stat *buf);int">
+  
+  <meta name="description" content="文件属性含义，修改文件属性，Unix文件系统结构和符号链接，目录操作。
+函数stat、fstat、fstatat和lstat12345#include &amp;lt;sys/stat.h&amp;gt;int stat(const char *restrict pathname, struct stat *restrict buf);int fstat(int fd, struct stat *buf);int">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Unix文件和目录">
+<meta property="og:url" content="http://www.xzh.space/2016/06/Unix文件和目录/index.html">
 <meta property="og:site_name" content="XZH">
-<meta property="og:description" content="编程 互联网 技术 程序员 码农">
+<meta property="og:description" content="文件属性含义，修改文件属性，Unix文件系统结构和符号链接，目录操作。
+函数stat、fstat、fstatat和lstat12345#include &amp;lt;sys/stat.h&amp;gt;int stat(const char *restrict pathname, struct stat *restrict buf);int fstat(int fd, struct stat *buf);int">
+<meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-4.5.PNG">
+<meta property="og:updated_time" content="2016-06-04T16:32:52.153Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="XZH">
-<meta name="twitter:description" content="编程 互联网 技术 程序员 码农">
+<meta name="twitter:title" content="Unix文件和目录">
+<meta name="twitter:description" content="文件属性含义，修改文件属性，Unix文件系统结构和符号链接，目录操作。
+函数stat、fstat、fstatat和lstat12345#include &amp;lt;sys/stat.h&amp;gt;int stat(const char *restrict pathname, struct stat *restrict buf);int fstat(int fd, struct stat *buf);int">
+<meta name="twitter:image" content="http://o877ej38d.bkt.clouddn.com/apue-4.5.PNG">
   
   
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -62,13 +71,7 @@ var _hmt = _hmt || [];
   </nav>
   <div class="clearfix"></div>
 </header>
-    <div class="content">
-
-
-
-
-  
-    <article class="post">
+    <div class="content"><article class="post">
   <header>
     
       <div class="icon"></div>
@@ -80,7 +83,7 @@ var _hmt = _hmt || [];
     
     
   
-    <h1 class="title"><a href="/2016/06/Unix文件和目录/">Unix文件和目录</a></h1>
+    <h1 class="title">Unix文件和目录</h1>
   
 
   </header>
@@ -95,124 +98,61 @@ var _hmt = _hmt || [];
 <p>fstatat是使用相对与fd的相对位置，这种带at的函数在文件系统中很常见，在说文件I/O时也介绍了open和openat在相对路径上的特点，都类似的，可参照。对于符号链接，fstatat函数返回：</p>
 <ul>
 <li>符号链接所指向的文件的信息（默认）</li>
-<li>符号链接本身的信息（设置了AT_SYMLINK_NOFOLLOW标志）
-    
-    
-  </div>
-  <footer class="end-sep">
-    
-      
-        <div class="alignleft">
-          <a href="/2016/06/Unix文件和目录/#more" class="more-link">阅读全文</a>
-        </div>
-      
-      
-    
-    <div class="clearfix">
-      
-    </div>
-  </footer>
-</article>
-
-
-
-
-  
-    <article class="post">
-  <header>
-    
-      <div class="icon"></div>
-      <a href="/2016/06/Unix文件IO/">
-  <time datetime="2016-06-02T14:53:48.000Z">
-    2016-06-02
-  </time>
-</a>
-    
-    
-  
-    <h1 class="title"><a href="/2016/06/Unix文件IO/">Unix文件I/O</a></h1>
-  
-
-  </header>
-  
-  <div class="entry">
-    
-      <p>Unix系统的文件I/O及函数调用。</p>
-<h2 id="文件描述符"><a href="#文件描述符" class="headerlink" title="文件描述符"></a>文件描述符</h2><p>文件描述符是一个非负整数，又内核分配，函数open和creat返回文件描述符，函数read和write需要文件描述符作为参数。</p>
-<p>在Unix系统中，文件描述符0，1，2有代表特殊的I/O：</p>
-<ul>
-<li>0 - 标准输入（stdin）</li>
-<li>1 - 标准输出（stdout）</li>
-<li>2 - 标准错误（stderr）</li>
+<li>符号链接本身的信息（设置了AT_SYMLINK_NOFOLLOW标志）<a id="more"></a>
+</li>
 </ul>
-<p>文件描述符的上限又操作系统的OPEN_MAX标识，表示一个进程最多能打开的文件个数，相应的文件描述符范围为 0-OPEN_MAX-1。</p>
-<h2 id="函数open和openat"><a href="#函数open和openat" class="headerlink" title="函数open和openat"></a>函数open和openat</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">open</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *path, <span class="keyword">int</span> oflag, ... <span class="comment">/* mode_t mode */</span>)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">openat</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">char</span> *path, <span class="keyword">int</span> oflag, ... <span class="comment">/* mode_t mode */</span>)</span></span>;</span><br></pre></td></tr></table></figure>
-<p>打开文件，并以当前最小可用文件描述符返回。</p>
-<p>带有at的函数一般是对应不带at的函数的相对路径版本，作为参照物的就是带有at函数的第一个参数（文件描述符），在文件IO的函数集中有很多这样的函数对。</p>
-<p>对于带有at的函数，有三种可能性：</p>
-<ul>
-<li>path是绝对路径，fd被忽略，和不带at的函数效果相同</li>
-<li>path是相对路径，则相对于fd所指示的目录，如果fd是AT_FDCWD，则相对于当前工作目录
-    
-    
-  </div>
-  <footer class="end-sep">
-    
-      
-        <div class="alignleft">
-          <a href="/2016/06/Unix文件IO/#more" class="more-link">阅读全文</a>
-        </div>
-      
-      
-    
-    <div class="clearfix">
-      
-    </div>
-  </footer>
-</article>
-
-
-
-
-  
-    <article class="post">
-  <header>
-    
-      <div class="icon"></div>
-      <a href="/2016/06/Hexo博客折腾记/">
-  <time datetime="2016-06-01T06:36:09.000Z">
-    2016-06-01
-  </time>
-</a>
-    
-    
-  
-    <h1 class="title"><a href="/2016/06/Hexo博客折腾记/">Hexo博客折腾记</a></h1>
-  
-
-  </header>
-  
-  <div class="entry">
-    
-      <p>博客(blog)本质是一个记录的地方，而其与手头上的笔记本(纸质或电子)的区别在于，博客是可以通过互联网访问到的，便自然多了分享的特点。<br>一般来说建立博客无非几个目的：</p>
+<p>buf是一个指向结构的指针，上述函数来填充这个结构。</p>
+<h2 id="文件类型"><a href="#文件类型" class="headerlink" title="文件类型"></a>文件类型</h2><p>Unix文件系统总共有6类文件：</p>
 <ol>
-<li>总结</li>
-<li>分享</li>
-<li><del>装逼</del></li>
+<li><p>普通文件，Unix内核并不区分文本文件和二进制文件，文件内容的解释是应用程序干的事。</p>
+</li>
+<li><p>目录文件，包含了其他文件名字以及指向与这些文件有关信息的指针，对一个目录有读权限的任一进程都可以读目录的内容，只有内核可以直接写目录文件，更改目录必须使用目录函数。</p>
+</li>
+<li><p>块特殊文件，对设备的带缓冲的访问，一次读写固定大小。</p>
+</li>
+<li><p>字符特殊文件，对设备不带缓冲的访问，每次访问长度可变。系统中的设备要么是字符特殊文件，要么就是块特殊文件。</p>
+</li>
+<li><p>FIFO，命名管道。</p>
+</li>
+<li><p>套接字。</p>
+</li>
+<li><p>符号链接，这种文件指向另一个文件。</p>
+</li>
 </ol>
+<h2 id="设置用户ID和设置组ID"><a href="#设置用户ID和设置组ID" class="headerlink" title="设置用户ID和设置组ID"></a>设置用户ID和设置组ID</h2><p>与一个进程相关联的ID有至少6个。</p>
+<p><img src="http://o877ej38d.bkt.clouddn.com/apue-4.5.PNG" alt="进程相关的用户ID和组ID"></p>
+
     
     
   </div>
-  <footer class="end-sep">
+  <footer>
     
       
-        <div class="alignleft">
-          <a href="/2016/06/Hexo博客折腾记/#more" class="more-link">阅读全文</a>
-        </div>
       
-      
+  <div class="tags">
+    <a class="tags-link" href="/tags/c/">c</a>, <a class="tags-link" href="/tags/unix/">unix</a>
+  </div>
+
     
     <div class="clearfix">
+      
+      <!-- JiaThis Button BEGIN -->
+</br>
+<div class="jiathis_style">
+	<span class="jiathis_txt">分享到：</span>
+	<a class="jiathis_button_tools_1"></a>
+	<a class="jiathis_button_tools_2"></a>
+	<a class="jiathis_button_tools_3"></a>
+	<a class="jiathis_button_tools_4"></a>
+	<a href="http://www.jiathis.com/share?uid=2102268" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+	<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript">
+var jiathis_config = {data_track_clickback:'true'};
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code_mini/jia.js?uid=2102268" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
       
     </div>
   </footer>
@@ -220,14 +160,11 @@ var _hmt = _hmt || [];
 
 
 
-
-  
-
-  <nav id="pagination">
-  
-  
-  <div class="clearfix"></div>
-</nav>
+<section id="comment">
+  <h1 class="title">评论</h1>
+  <div class="ds-thread" data-title="Unix文件和目录">
+  </div>
+</section>
 
 </div>
   </div>
