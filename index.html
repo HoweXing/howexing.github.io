@@ -93,7 +93,16 @@ var _hmt = _hmt || [];
 <ul>
 <li>0 - 标准输入（stdin）</li>
 <li>1 - 标准输出（stdout）</li>
-<li>2 - 标准错误（stderr）
+<li>2 - 标准错误（stderr）</li>
+</ul>
+<p>文件描述符的上限又操作系统的OPEN_MAX标识，表示一个进程最多能打开的文件个数，相应的文件描述符范围为 0-OPEN_MAX-1。</p>
+<h2 id="函数open和openat"><a href="#函数open和openat" class="headerlink" title="函数open和openat"></a>函数open和openat</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">open</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *path, <span class="keyword">int</span> oflag, ... <span class="comment">/* mode_t mode */</span>)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">openat</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">char</span> *path, <span class="keyword">int</span> oflag, ... <span class="comment">/* mode_t mode */</span>)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>打开文件，并以当前最小可用文件描述符返回。</p>
+<p>带有at的函数一般是对应不带at的函数的相对路径版本，作为参照物的就是带有at函数的第一个参数（文件描述符），在文件IO的函数集中有很多这样的函数对。</p>
+<p>对于带有at的函数，有三种可能性：</p>
+<ul>
+<li>path是绝对路径，fd被忽略，和不带at的函数效果相同</li>
+<li>path是相对路径，则相对于fd所指示的目录，如果fd是AT_FDCWD，则相对于当前工作目录
     
     
   </div>
