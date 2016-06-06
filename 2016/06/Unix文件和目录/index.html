@@ -24,7 +24,10 @@
 <meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-4.5.PNG">
 <meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-4.6.PNG">
 <meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-4.11.PNG">
-<meta property="og:updated_time" content="2016-06-05T13:58:10.852Z">
+<meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-4.13.PNG">
+<meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-4.14.PNG">
+<meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-4.15.PNG">
+<meta property="og:updated_time" content="2016-06-06T14:50:06.288Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Unix文件和目录">
 <meta name="twitter:description" content="文件属性含义，修改文件属性，Unix文件系统结构和符号链接，目录操作。
@@ -185,6 +188,64 @@ var _hmt = _hmt || [];
 <p>fchownat函数在因为at导致的不同以及flag的AT_SYMLINK_NOFOLLOW是否设置上，可以分别和chown以及lchown效果相同。</p>
 <p>当_POSIX_CHOWN_RESTRICTED有效时，除了超级用户，不能更改其他用户文件的用户ID。你可以更改你所拥有的文件的组ID，但只能改到你所属的组。</p>
 <p>如果这些函数由非超级用户进程调用，则在成功返回时，该文件的设置用户ID位和设置组ID位都被清除。</p>
+<h2 id="文件长度"><a href="#文件长度" class="headerlink" title="文件长度"></a>文件长度</h2><p>stat结构的st_size成员表示以字节位单位的文件的长度，只对普通文件、目录文件和符号链接有效。</p>
+<ul>
+<li>普通文件，从文件开始，一直到文件结束符EOF的长度</li>
+<li>目录文件，长度通常是一个常数的整数倍</li>
+<li>符号链接，长度是文件名（即全路径名）的实际字节数，如路径名usr/lib长度为7</li>
+</ul>
+<p>对于块特殊文件，st_blksize和st_blocks分别表示块大小和块数量。</p>
+<p>文件空洞是设置的偏移量超过文件尾端并进行写造成的，含有空洞的文件，可以发现其标示长度大小总是大于其占用的实际磁盘空间，因为空洞并不占实际空间。对该文件进行打印，空洞部分会以0x00输出。但是如果对其进行复制操作，新文件的空洞就占用了空间。</p>
+<h2 id="文件截断"><a href="#文件截断" class="headerlink" title="文件截断"></a>文件截断</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">truncate</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *pathname, <span class="keyword">off_t</span> length)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">ftruncate</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">off_t</span> length)</span></span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>若文件长度大于length，则截断后，length以后的部分将不能访问</li>
+<li>若文件长度小于length，则会在不到length的部分创建一个空洞</li>
+</ul>
+<p>在打开文件时设置O_TRUNC也会将文件截断为0。</p>
+<h2 id="文件系统"><a href="#文件系统" class="headerlink" title="文件系统"></a>文件系统</h2><p>一个磁盘可能有一个或多个分区，每个分区可以包含一个文件系统，i节点是固定程度的记录项，包含有关文件的大部分信息。</p>
+<p><img src="http://o877ej38d.bkt.clouddn.com/apue-4.13.PNG" alt="磁盘、分区和文件系统"></p>
+<p>那么来详细看目录、文件、i节点以及数据块之间的关系。</p>
+<p><img src="http://o877ej38d.bkt.clouddn.com/apue-4.14.PNG" alt="i节点和数据块"></p>
+<ul>
+<li><p>图中有两个目录项指向同一个i节点，每个i节点都有一个链接计数，表示指向该i节点的目录项数，只有链接计数减少到0时，才可删除该文件，即释放该文件占用的数据块。所以，解除对一个文件的链接，并不总意味着释放该文件占用的数据块。故删除一个目录项的函数被称为unlink而不是delete。stat结构中，st_nlink表示链接计数，基本系统数据类型为nlink_t，常量LINK_MAX制定了一个文件链接数的最大值。这种链接是硬链接。</p>
+</li>
+<li><p>符号链接文件的实际内容是所指向文件的名字（全路径名），用ls -al观察时，符号链接最前面是l开头的。符号链接的i节点中的文件类型是S_IFLNK。</p>
+</li>
+<li><p>i节点包含了文件有关的所有信息，文件类型、文件访问权限位、文件长度和指向文件数据块的指针等，stat结构的大部分取自i节点，只有文件名和i节点编号是在目录项中的。i节点编号的数据类型为ino_t。</p>
+</li>
+<li><p>因为目录项中的i节点编号指向同一文件系统中相应i节点，不能指向另一个文件系统的i节点，所以ln命令（使用link函数）不能跨文件系统。</p>
+</li>
+<li><p>当在同一文件系统内进行文件重命名，该文件的实际内容并未移动，只需构造一个指向现有i节点的新目录项，并删除老的目录项，链接计数不会改变。这是mv命令的操作方式。</p>
+</li>
+</ul>
+<p>接着看目录的链接计数</p>
+<p><img src="http://o877ej38d.bkt.clouddn.com/apue-4.15.PNG" alt="目录的i节点和链接计数"></p>
+<p>图中testdir是新创建的目录，任何一个叶目录的链接计数总是2，来自testdir本身以及内部的.项，途中编号2549的i节点是testdir的。另外一个目录对应1267号i节点，它是testdir的父目录，其链接计数大于等于3，来自其本身，其内部的.项，testdir的..项，以及其他的子目录（testdir同一级）的..项。</p>
+<h2 id="函数link、linkat、unlink、unlinkat和remove"><a href="#函数link、linkat、unlink、unlinkat和remove" class="headerlink" title="函数link、linkat、unlink、unlinkat和remove"></a>函数link、linkat、unlink、unlinkat和remove</h2><p>创建一个指向现有文件的链接的方法是使用link函数或linkat函数。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">link</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *existingpath, <span class="keyword">const</span> <span class="keyword">char</span> *newpath)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">linkat</span><span class="params">(<span class="keyword">int</span> efd, <span class="keyword">const</span> <span class="keyword">char</span> *existingpath, <span class="keyword">int</span> nfd, </span><br><span class="line">           <span class="keyword">const</span> <span class="keyword">char</span> *nwepath, <span class="keyword">int</span> flag)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>existingpath应是已存在的路径名，newpath中的各通过路径应已存在，newpath中最后一个分量（即新的链接名）应尚不存在。</p>
+<p>当现有文件是一个符号链接时，flag参数来控制模式：</p>
+<ul>
+<li>flag设置了AT_SYMLINK_FOLLOW，创建指向符号链接目标的链接</li>
+<li>flag清除了AT_SYMLINK_FOLLOW，创建指向符号链接本身的链接</li>
+</ul>
+<p>创建新目录项和增加链接计数是一个原子操作。</p>
+<p>如果支持创建指向一个目录的硬链接，那么也仅有超级用户可以这么做，因为可能在文件系统中造成循环，大多数文件系统的程序都不能处理这种情况，所以，一般不允许对于目录的硬链接。</p>
+<p>删除一个现有的目录项，使用unlink函数或unlinkat函数。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">unlink</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *pathname)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">unlinkat</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">char</span> *path, <span class="keyword">int</span> flag)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>删除目录项，并将由pathname引用文件的链接计数减1.如果对该文件还有其他链接，则认可通过其他链接访问该文件的数据。若函数出错，则不进行任何更改。</p>
+<p>为了解除对文件的链接，必须对包含该目录项的目录具有写权限和执行权限，如果目录设置了粘着位，除了写权限外，还要满足3个条件，见粘着位相关。</p>
+<p>只有链接计数为0时才删除文件的内容，若此时还有进程打开该文件，也不能删除。</p>
+<p>关闭文件时，内核进行下述检查，来看是否删除该文件：</p>
+<ol>
+<li>打开该文件的进程个数是否为0</li>
+<li>文件的链接计数是否为0</li>
+</ol>
+<p>当flag设置了AT_REMOVEDIR标志时，unlinkat可以像rmdir一样删除目录，否则和unlink相同。</p>
+<p>unlink必须等文件计数和进程计数都为0才删除文件的特性，经常被用来确保即使是在程序崩溃时，它所创建的临时文件也不会遗留下来。进程用open或creat创建一个文件，然后立即调用unlink，进程依然打开该文件时，它不会被删除，当进程关闭该文件或进程退出时，文件被删除。</p>
+<p>如果pathname是符号链接，那么unlink删除该符号链接，而不是删除符号链接的目标文件，给出符号链接名的情况下，没有一个函数能删除该链接所引用的文件。</p>
+<p>也可以使用remove函数解除对一个文件或目录的链接，对于文件，remove和unlink相同，对于目录，remove和rmdir相同。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">remove</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *pathname)</span></span>;</span><br></pre></td></tr></table></figure>
 
     
     
