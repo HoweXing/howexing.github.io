@@ -27,7 +27,11 @@
 <meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-4.13.PNG">
 <meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-4.14.PNG">
 <meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-4.15.PNG">
-<meta property="og:updated_time" content="2016-06-06T14:50:06.288Z">
+<meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-4.17.PNG">
+<meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-4.18.PNG">
+<meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-4.19.PNG">
+<meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-4.20.PNG">
+<meta property="og:updated_time" content="2016-06-15T15:10:31.579Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Unix文件和目录">
 <meta name="twitter:description" content="文件属性含义，修改文件属性，Unix文件系统结构和符号链接，目录操作。
@@ -246,7 +250,75 @@ var _hmt = _hmt || [];
 <p>如果pathname是符号链接，那么unlink删除该符号链接，而不是删除符号链接的目标文件，给出符号链接名的情况下，没有一个函数能删除该链接所引用的文件。</p>
 <p>也可以使用remove函数解除对一个文件或目录的链接，对于文件，remove和unlink相同，对于目录，remove和rmdir相同。</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">remove</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *pathname)</span></span>;</span><br></pre></td></tr></table></figure>
-
+<h2 id="函数rename和renameat"><a href="#函数rename和renameat" class="headerlink" title="函数rename和renameat"></a>函数rename和renameat</h2><p>文件或目录可以用rename函数或者renameat函数进行重命名。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">rename</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *oldname, <span class="keyword">const</span> <span class="keyword">char</span> *newname)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">renameat</span><span class="params">(<span class="keyword">int</span> oldfd, <span class="keyword">const</span> <span class="keyword">char</span> *oldname, <span class="keyword">int</span> newfd,</span><br><span class="line">             <span class="keyword">const</span> <span class="keyword">char</span> *newname)</span></span>;</span><br></pre></td></tr></table></figure>
+<ol>
+<li><p>如果oldname指的是一个文件而不是目录，那么为该文件或符号链接重命名。此时，newname若已存在，则它不能是一个目录，应该也是一个文件，将先删除该已存在的目录项，再将oldname重命名为newname，对包含oldname的目录和包含newname的目录都要有写权限和执行权限（因为修改目录项），因为将更改这两个目录。</p>
+</li>
+<li><p>如果oldname指的是一个目录，那么为该目录重命名。此时newname若已存在，则它应该也是一个目录，而且应该是空目录，将先把它删除，再将olaname重命名为newname。oldname不应该是oldname的一个路径前缀，因为删除了的oldname的叶目录，又出现在newname之中。</p>
+</li>
+<li><p>如果oldname或newname引用符号链接，则处理的是符号链接本身，而不是它所引用的文件。</p>
+</li>
+<li><p>不能对.和..进行重命名。</p>
+</li>
+<li><p>若oldname和newname相同，不做任何操作。</p>
+</li>
+</ol>
+<h2 id="符号链接"><a href="#符号链接" class="headerlink" title="符号链接"></a>符号链接</h2><p>符号链接是对一个文件的间接指针，它与上一节所述的硬链接有所不同，硬链接之间指向文件的i节点，引入符号链接的原因是为了避开硬链接的一些限制：</p>
+<ul>
+<li>硬链接通常要求链接和文件位于同一文件系统</li>
+<li>只有超级用户才能创建指向目录的硬链接（为了避免循环）</li>
+</ul>
+<p>符号链接一般用于将一个文件或整个目录结构移到系统中另一个位置。</p>
+<p>当使用以名字引用文件的函数时，要知道该函数是否跟随符号链接，跟随则处理符号链接的目标文件，否则处理符号链接自身。</p>
+<p><img src="http://o877ej38d.bkt.clouddn.com/apue-4.17.PNG" alt="函数是否跟随符号链接"></p>
+<p>对于mk和rm开头的函数，路径名是符号链接时会出错返回。</p>
+<p>以文件描述符fd作为参数的函数，其fd是open打开的，而open已经跟随了符号链接。</p>
+<p>例外，同时用O_CREAT和_EXCL两者调用open函数，若路径名为符号链接，open将出错返回，errno设置为EEXIST，这种处理方式意图是堵塞一个安全漏洞，以防止具有特权的进程被诱骗写错误的文件。</p>
+<p>使用符号链接可能在文件系统中引入循环，大多数查找路径名的函数在这种情况下都将出错返回，errno为ELOOP。</p>
+<p>下图中有一个构成循环的符号链接。</p>
+<p><img src="http://o877ej38d.bkt.clouddn.com/apue-4.18.PNG" alt="构成循环的符号链接"></p>
+<p>foo目录下，有一个testdir的符号链接，而这个符号链接指向foo。</p>
+<p>这样一个循环是很容易消除的，因为unlink并不跟随符号链接，所以可以unlink文件foo/testdir。但是如果创建了一个构成这种循环的硬链接，就很难消除它，所以link函数只允许超级用户构造指向目录的硬链接。</p>
+<p>用open打开文件时，如果参数是一个符号链接，open将跟随符号链接到目标文件，若目标文件不存在，open将出错返回。所以打开一个存在的符号链接，open也可能出错返回，因为链接指向的目标不存在。</p>
+<h2 id="创建和读取符号链接"><a href="#创建和读取符号链接" class="headerlink" title="创建和读取符号链接"></a>创建和读取符号链接</h2><p>用symlink和symlinkat函数创建一个符号链接。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">symlink</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *actualpath, <span class="keyword">const</span> <span class="keyword">char</span> *sympath)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">symlinkat</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *actualpath, <span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">char</span> *sympath)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>函数创建了一个指向actualpath的新目录项sympath，并不要求actualpath一定存在，它们也不需要位于同一文件系统。</p>
+<p>因为open函数跟随符号链接，所以提供了readlink和readlinkat函数打开链接本身并读该链接中的名字。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="keyword">ssize_t</span> readlink(<span class="keyword">const</span> <span class="keyword">char</span> *<span class="keyword">restrict</span> pathname, <span class="keyword">char</span> *<span class="keyword">restrict</span> buf,</span><br><span class="line">		 <span class="keyword">size_t</span> bufsize);</span><br><span class="line"><span class="keyword">ssize_t</span> readlinkat(<span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">char</span> *<span class="keyword">restrict</span> pathname, <span class="keyword">char</span> *<span class="keyword">restrict</span> buf,</span><br><span class="line">		   <span class="keyword">size_t</span> bufsize);</span><br></pre></td></tr></table></figure>
+<h2 id="文件的时间"><a href="#文件的时间" class="headerlink" title="文件的时间"></a>文件的时间</h2><p>08年之后的版本，stat结构中时间字段的精度从秒提高到秒加上纳秒。而文件属性保存的时间的实际精度依赖于文件系统的实现，如果系统只能精确到秒，那么纳秒部分被填充0，如果系统精确超过了秒，那么将精确到纳秒。</p>
+<p>每个文件有下列三种时间字段：</p>
+<p><img src="http://o877ej38d.bkt.clouddn.com/apue-4.19.PNG" alt="三个时间字段"></p>
+<p>修改时间（st_mtim）和状态更改时间（st_ctim）之间的区别：</p>
+<ul>
+<li>修改时间是文件内容最后一次被修改的时间，状态更改时间是该文件的i节点最后一次被修改的时间</li>
+<li>i节点中的所有信息都是与文件的实际内容分开存放的</li>
+<li>更改文件的访问权限、更改用户ID、更改链接数等都是更改了i节点的内容，并没有改动文件实际内容</li>
+<li>系统并不维护对一个i节点的最后一次访问时间</li>
+</ul>
+<p>目录是包含目录项的文件，增加、删除或修改目录项会影响到它所在目录的三个时间</p>
+<p><img src="http://o877ej38d.bkt.clouddn.com/apue-4.20.PNG" alt="函数调用对时间字段的影响"></p>
+<h2 id="函数futimens、utimensat和utimes"><a href="#函数futimens、utimensat和utimes" class="headerlink" title="函数futimens、utimensat和utimes"></a>函数futimens、utimensat和utimes</h2><p>文件的访问和修改时间可以用以下几个函数更改，futimens和utimensat函数可以指定纳秒精度的时间戳，timespec结构是和stat结构中的时间结构相同。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">futimens</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">struct</span> timespec times[<span class="number">2</span>])</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">utimensat</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">char</span> *path, <span class="keyword">const</span> <span class="keyword">struct</span> timespec times[<span class="number">2</span>],</span><br><span class="line">	      <span class="keyword">int</span> flag)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>time数组第一个元素是访问时间，第二个是修改时间，都是Unix时间戳秒数，不足秒的用纳秒表示。</p>
+<p>时间戳指定方式：</p>
+<ul>
+<li>若times是空指针，访问时间和修改时间都设为当前时间</li>
+<li>若一个数组元素的tv_nsec字段值为UTIME_NOW，相应的时间戳设为当前时间，忽略相应的tv_sec字段</li>
+<li>若一个数组元素的tv_nsec字段值为UTIME_OMIT，相应的时间戳保持不变，忽略相应的tv_sec字段</li>
+<li>否则时间戳设置为相应的tx_nsec和tv_sec字段值</li>
+</ul>
+<p>执行这些函数需要的权限，取决于times参数的值：</p>
+<ul>
+<li>若times是空指针，或者任意tv_nsec字段为UTIME_NOW，则进程的有效ID必须等于文件所有者ID，必须具有写权限，或者为超级用户进程</li>
+<li>若times是非空指针，并且任一tv_nsec字段值既不是UTIME_NOW也不是UTIME_OMIT，则进程的有效用户ID必须等于文件所有者ID，或者进程是超级用户进程，只有写权限不够</li>
+<li>若times是非空指针，并且两个tv_nsec字段值都为UTIME_OMIT，就不执行权限检查</li>
+</ul>
+<p>对于符号链接，utimensat默认行为是跟随符号链接，并把文件的时间改成符号链接的时间，通过设置flag为AT_SYMLINK_NOFOLLOW，则符号链接本身的时间就会被修改。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/time.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">utimes</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *pathname, <span class="keyword">const</span> <span class="keyword">struct</span> timeval times[<span class="number">2</span>])</span></span>;</span><br></pre></td></tr></table></figure>
+<p>除了timeval结构是如下之外，和上面两个函数类似</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> timeval&#123;</span><br><span class="line">	<span class="keyword">time_t</span> tv_sec; <span class="comment">//秒</span></span><br><span class="line">	<span class="keyword">long</span> tv_usec; <span class="comment">//微秒</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="函数mkdir、mkdirat和rmdir"><a href="#函数mkdir、mkdirat和rmdir" class="headerlink" title="函数mkdir、mkdirat和rmdir"></a>函数mkdir、mkdirat和rmdir</h2>
     
     
   </div>
