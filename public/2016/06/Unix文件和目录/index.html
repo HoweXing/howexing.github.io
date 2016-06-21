@@ -4,22 +4,22 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
   
-  <title>Unix文件和目录 | XZH</title>
+  <title>UNIX文件和目录 | XZH</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   
     <meta name="author" content="xingzhihao">
   
   
-    <meta name="description" content="文件属性含义，修改文件属性，Unix文件系统结构和符号链接，目录操作。
+    <meta name="description" content="文件属性含义，修改文件属性，UNIX文件系统结构和符号链接，目录操作。
 函数stat、fstat、fstatat和lstat12345#include &amp;lt;sys/stat.h&amp;gt;int stat(const char *restrict pathname, struct stat *restrict buf);int fstat(int fd, struct stat *buf);int">
   
-  <meta name="description" content="文件属性含义，修改文件属性，Unix文件系统结构和符号链接，目录操作。
+  <meta name="description" content="文件属性含义，修改文件属性，UNIX文件系统结构和符号链接，目录操作。
 函数stat、fstat、fstatat和lstat12345#include &amp;lt;sys/stat.h&amp;gt;int stat(const char *restrict pathname, struct stat *restrict buf);int fstat(int fd, struct stat *buf);int">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Unix文件和目录">
+<meta property="og:title" content="UNIX文件和目录">
 <meta property="og:url" content="http://www.xzh.space/2016/06/Unix文件和目录/index.html">
 <meta property="og:site_name" content="XZH">
-<meta property="og:description" content="文件属性含义，修改文件属性，Unix文件系统结构和符号链接，目录操作。
+<meta property="og:description" content="文件属性含义，修改文件属性，UNIX文件系统结构和符号链接，目录操作。
 函数stat、fstat、fstatat和lstat12345#include &amp;lt;sys/stat.h&amp;gt;int stat(const char *restrict pathname, struct stat *restrict buf);int fstat(int fd, struct stat *buf);int">
 <meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-4.5.PNG">
 <meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-4.6.PNG">
@@ -32,10 +32,10 @@
 <meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-4.19.PNG">
 <meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-4.20.PNG">
 <meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-4.26.PNG">
-<meta property="og:updated_time" content="2016-06-16T14:05:41.069Z">
+<meta property="og:updated_time" content="2016-06-21T15:14:46.992Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Unix文件和目录">
-<meta name="twitter:description" content="文件属性含义，修改文件属性，Unix文件系统结构和符号链接，目录操作。
+<meta name="twitter:title" content="UNIX文件和目录">
+<meta name="twitter:description" content="文件属性含义，修改文件属性，UNIX文件系统结构和符号链接，目录操作。
 函数stat、fstat、fstatat和lstat12345#include &amp;lt;sys/stat.h&amp;gt;int stat(const char *restrict pathname, struct stat *restrict buf);int fstat(int fd, struct stat *buf);int">
 <meta name="twitter:image" content="http://o877ej38d.bkt.clouddn.com/apue-4.5.PNG">
   
@@ -93,14 +93,14 @@ var _hmt = _hmt || [];
     
     
   
-    <h1 class="title">Unix文件和目录</h1>
+    <h1 class="title">UNIX文件和目录</h1>
   
 
   </header>
   
   <div class="entry">
     
-      <p>文件属性含义，修改文件属性，Unix文件系统结构和符号链接，目录操作。</p>
+      <p>文件属性含义，修改文件属性，UNIX文件系统结构和符号链接，目录操作。</p>
 <h2 id="函数stat、fstat、fstatat和lstat"><a href="#函数stat、fstat、fstatat和lstat" class="headerlink" title="函数stat、fstat、fstatat和lstat"></a>函数stat、fstat、fstatat和lstat</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">stat</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *<span class="keyword">restrict</span> pathname, <span class="keyword">struct</span> stat *<span class="keyword">restrict</span> buf)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">fstat</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">struct</span> stat *buf)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">lstat</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *<span class="keyword">restrict</span> pathname, <span class="keyword">struct</span> stat *<span class="keyword">restrict</span> buf)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">fstatat</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">char</span> <span class="keyword">restrict</span> pathname, <span class="keyword">struct</span> stat *<span class="keyword">restrict</span> buf, <span class="keyword">int</span> flag)</span></span>;</span><br></pre></td></tr></table></figure>
 <p>stat函数返回指定路径文件有关的信息结构。</p>
 <p>fstat函数获得已在fd上打开文件的信息。</p>
@@ -112,9 +112,9 @@ var _hmt = _hmt || [];
 </li>
 </ul>
 <p>buf是一个指向结构的指针，上述函数来填充这个结构。</p>
-<h2 id="文件类型"><a href="#文件类型" class="headerlink" title="文件类型"></a>文件类型</h2><p>Unix文件系统总共有6类文件：</p>
+<h2 id="文件类型"><a href="#文件类型" class="headerlink" title="文件类型"></a>文件类型</h2><p>UNIX文件系统总共有6类文件：</p>
 <ol>
-<li><p>普通文件，Unix内核并不区分文本文件和二进制文件，文件内容的解释是应用程序干的事。</p>
+<li><p>普通文件，UNIX内核并不区分文本文件和二进制文件，文件内容的解释是应用程序干的事。</p>
 </li>
 <li><p>目录文件，包含了其他文件名字以及指向与这些文件有关信息的指针，对一个目录有读权限的任一进程都可以读目录的内容，只有内核可以直接写目录文件，更改目录必须使用目录函数。</p>
 </li>
@@ -179,7 +179,7 @@ var _hmt = _hmt || [];
 <p>为改变一个文件的权限位，进程的有效用户ID必须等于文件的所有者ID，或者该进程必须具有超级用户权限。</p>
 <p>参数mode的值是下列常量的或。</p>
 <p><img src="http://o877ej38d.bkt.clouddn.com/apue-4.11.PNG" alt="chmod的mode常量"></p>
-<h2 id="粘着位"><a href="#粘着位" class="headerlink" title="粘着位"></a>粘着位</h2><p>在Unix尚未使用请求分页式技术的早期版本中，S_ISVTX位被称为粘着位，设置了粘着位的文件将在第一次使用被加载以后就一直在交换区中，直到系统重启，这样使得文件被再次使用时有更快的加载速度，因为文件各数据块可能是随机存放的，而交换区是被作为一个连续文件处理的。</p>
+<h2 id="粘着位"><a href="#粘着位" class="headerlink" title="粘着位"></a>粘着位</h2><p>在UNIX尚未使用请求分页式技术的早期版本中，S_ISVTX位被称为粘着位，设置了粘着位的文件将在第一次使用被加载以后就一直在交换区中，直到系统重启，这样使得文件被再次使用时有更快的加载速度，因为文件各数据块可能是随机存放的，而交换区是被作为一个连续文件处理的。</p>
 <p>现今的系统扩展了粘着位的使用范围，允许对目录设置粘着位，如果一个目录被设置了粘着位，只有对该目录具有写权限的用户且满足下列条件之一，才能删除或重命名该目录下的文件：</p>
 <ul>
 <li>拥有此文件</li>
@@ -301,7 +301,7 @@ var _hmt = _hmt || [];
 <p><img src="http://o877ej38d.bkt.clouddn.com/apue-4.20.PNG" alt="函数调用对时间字段的影响"></p>
 <h2 id="函数futimens、utimensat和utimes"><a href="#函数futimens、utimensat和utimes" class="headerlink" title="函数futimens、utimensat和utimes"></a>函数futimens、utimensat和utimes</h2><p>文件的访问和修改时间可以用以下几个函数更改，futimens和utimensat函数可以指定纳秒精度的时间戳，timespec结构是和stat结构中的时间结构相同。</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">futimens</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">struct</span> timespec times[<span class="number">2</span>])</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">utimensat</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">char</span> *path, <span class="keyword">const</span> <span class="keyword">struct</span> timespec times[<span class="number">2</span>],</span><br><span class="line">	      <span class="keyword">int</span> flag)</span></span>;</span><br></pre></td></tr></table></figure>
-<p>time数组第一个元素是访问时间，第二个是修改时间，都是Unix时间戳秒数，不足秒的用纳秒表示。</p>
+<p>time数组第一个元素是访问时间，第二个是修改时间，都是UNIX时间戳秒数，不足秒的用纳秒表示。</p>
 <p>时间戳指定方式：</p>
 <ul>
 <li>若times是空指针，访问时间和修改时间都设为当前时间</li>
@@ -352,7 +352,7 @@ var _hmt = _hmt || [];
       
       
   <div class="tags">
-    <a class="tags-link" href="/tags/c/">c</a>, <a class="tags-link" href="/tags/unix/">unix</a>
+    <a class="tags-link" href="/tags/C/">C</a>, <a class="tags-link" href="/tags/UNIX/">UNIX</a>
   </div>
 
     
@@ -384,7 +384,7 @@ var jiathis_config = {data_track_clickback:'true'};
 
 <section id="comment">
   <h1 class="title">评论</h1>
-  <div class="ds-thread" data-title="Unix文件和目录">
+  <div class="ds-thread" data-title="UNIX文件和目录">
   </div>
 </section>
 
