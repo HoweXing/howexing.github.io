@@ -27,7 +27,7 @@
 <meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-5.9.PNG">
 <meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-5.10.PNG">
 <meta property="og:image" content="http://o877ej38d.bkt.clouddn.com/apue-5.14.PNG">
-<meta property="og:updated_time" content="2016-06-23T15:35:09.126Z">
+<meta property="og:updated_time" content="2016-06-23T15:53:23.634Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="UNIX标准I/O库">
 <meta name="twitter:description" content="流和FILE对象文件I/O中，当打开一个文件时，即返回一个文件描述符，然后该文件描述符就用于后续的I/O操作。而对于标准I/O库，它们的操作是围绕流进行的，当使用标准I/O库打开或创建一个文件时，我们已使一个流与一个文件相关联。
@@ -236,7 +236,7 @@ var _hmt = _hmt || [];
 <h3 id="格式化输入"><a href="#格式化输入" class="headerlink" title="格式化输入"></a>格式化输入</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">scanf</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *<span class="keyword">restrict</span> format, ...)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">fscanf</span><span class="params">(FILE *<span class="keyword">restrict</span> fp, <span class="keyword">const</span> <span class="keyword">char</span> *<span class="keyword">restrict</span> format, ...)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">sscanf</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *<span class="keyword">restrict</span> buf, <span class="keyword">const</span> <span class="keyword">char</span> *<span class="keyword">restrict</span> format, ...)</span></span>;</span><br></pre></td></tr></table></figure>
 <p>转换说明</p>
 <p>%[*][fldwidth][m][lenmodifier]convtype</p>
-<p>其中<em>号的作用是抑制转换，依然解析，但不保存，如对字符串1/2进行%d%</em>c%d转换，并在参数表中放置&amp;x,&amp;y，则1和2分别放入x和y变量中，中间的字符类型被解析但被抛弃。</p>
+<p>其中*号的作用是抑制转换，依然解析，但不保存，如对字符串1/2进行%d%*c%d转换，并在参数表中放置&amp;x,&amp;y，则1和2分别放入x和y变量中，中间的字符类型被解析但被抛弃。</p>
 <p>m是赋值分配符，可用于%c、%s和%[转换符，迫使内存缓冲区分配空间以接纳转换字符串。这种情况下，相关参数必须是指针地址，分配的缓冲区地址必须复制给该指针。如果调用成功，该分配的空间由调用者使用free释放。</p>
 <p>convtype和printf函数族稍有不同。</p>
 <p><img src="http://o877ej38d.bkt.clouddn.com/apue-5.10.PNG" alt="convtype转换类型"></p>
